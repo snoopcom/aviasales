@@ -3,7 +3,7 @@ import { Main, Logo } from './Style';
 import logo from '../../assets/Logo.png';
 import Tickets from '../tickets/Tickets';
 
-function App() {
+const App = () => {
   return (
     <div>
       <Logo src={logo} alt="logo" />
@@ -12,6 +12,6 @@ function App() {
       </Main>
     </div>
   );
-}
+};
 
 export default App;

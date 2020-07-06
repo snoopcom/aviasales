@@ -1,10 +1,10 @@
 import React from 'react';
 import { getData, getSearchId } from '../../api/DataRequest';
-import Ticket from '../ticket/Ticket';
 import { cutArray } from '../../api/Utils';
+import Ticket from '../ticket/Ticket';
 import Sort from '../sort/Sort';
 import Filter from '../filter/Filter';
-import { BlockСontrol, BlockSort, List, Loading, LoadingInner } from './Style';
+import { BlockСontrol, BlockSort, List } from './Style';
 
 const initState = {
   arrTickets: [],
@@ -20,7 +20,7 @@ export default class Tickets extends React.Component {
     super(props);
     this.state = initState;
 
-    /* загружаем  */
+    /* загружаем страницу */
     this.onLoadPage = async () => {
       const serchId = await getSearchId(); // получили serchId
       await this.onLoadTickets(serchId); // вызываем onLoadTickets и передаем полученную строку serchId
@@ -35,7 +35,6 @@ export default class Tickets extends React.Component {
         const response = await getData(serchId); // вызвали getData и прокинули serchId. Дальше она обработается в файле dataRequest
         stop = response.data.stop; // присвоили значение стоп
 
-        // console.log(arrTickets)
         const allTickets = response.data.tickets; // вытащили все тикется и присвоили allTickets
         this.setState({
           arrTickets: [...arrTickets, ...allTickets], // добавили в наш новый сформированный массив тикеты
@@ -111,6 +110,17 @@ export default class Tickets extends React.Component {
         }
       }
     };
+
+    /* фильтруем по пересадкам */
+    this.filterTikets = () => {
+      const { noStops, oneStop, twoStops, threeStops, arrTickets } = this.state;
+      const checkedStops = [noStops, oneStop, twoStops, threeStops];
+      const filtered = arrTickets.filter((ticket) => {
+        const { stops } = ticket.segments[0];
+        return checkedStops[stops.length];
+      });
+      return filtered; // вернули отфильтрованный массив
+    };
   }
 
   componentDidMount() {
@@ -118,15 +128,8 @@ export default class Tickets extends React.Component {
   }
 
   render() {
-    const { noStops, oneStop, twoStops, threeStops, allStops, arrTickets } = this.state;
-    const checkedStops = [noStops, oneStop, twoStops, threeStops]; // массив со свойствами
-    const ticketsFiltered = arrTickets.filter((ticket) => {
-      // наш массив с пачкой билетов
-      const { stops } = ticket.segments[0]; // массив со всеми пересадками
-      return checkedStops[stops.length]; // здесь длина массива пересадки
-    });
-    // console.log(ticketsFiltered);
-    const firstFiveTickets = cutArray(ticketsFiltered, 5); // первых пять билетов
+    const { noStops, oneStop, twoStops, threeStops, allStops } = this.state;
+    const firstFiveTickets = cutArray(this.filterTikets(), 5); // первых пять билетов
 
     /* список билетов */
     const ticketsList = firstFiveTickets.map((ticket) => (
@@ -142,11 +145,6 @@ export default class Tickets extends React.Component {
           threeStops={threeStops}
           onFilterCheck={this.onFilterCheck}
         />
-        {arrTickets.length === 0 ? (
-          <Loading>
-            <LoadingInner />
-          </Loading>
-        ) : null}
         <BlockSort>
           <Sort onSortChange={this.onSortChange} />
           <List>{ticketsList}</List>
