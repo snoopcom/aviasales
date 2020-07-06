@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 import { getData, getSearchId } from '../../api/DataRequest';
 import { cutArray } from '../../api/Utils';
 import Ticket from '../ticket/Ticket';
@@ -33,6 +34,7 @@ export default class Tickets extends React.Component {
       let stop; // просто создали переменную
       try {
         const response = await getData(serchId); // вызвали getData и прокинули serchId. Дальше она обработается в файле dataRequest
+
         stop = response.data.stop; // присвоили значение стоп
 
         const allTickets = response.data.tickets; // вытащили все тикется и присвоили allTickets
@@ -133,7 +135,12 @@ export default class Tickets extends React.Component {
 
     /* список билетов */
     const ticketsList = firstFiveTickets.map((ticket) => (
-      <Ticket segments={ticket.segments} price={ticket.price} carrier={ticket.carrier} />
+      <Ticket
+        key={_.uniqueId()}
+        segments={ticket.segments}
+        price={ticket.price}
+        carrier={ticket.carrier}
+      />
     ));
     return (
       <BlockСontrol>

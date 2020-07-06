@@ -16,7 +16,7 @@ const cutArray = (arr, numberElemArr) => {
 /* расчитали время */
 const formatDuration = (duration) => `${Math.floor(duration / 60)} ч ${duration % 60} м`;
 
-/* расчитали дату/время */
+/* расчитали дату */
 const formatInterval = (date, duration) =>
   `${lightFormat(new Date(date), 'HH:mm')} – ${lightFormat(
     addMinutes(new Date(date), duration),
