@@ -23,31 +23,27 @@ export default class Tickets extends React.Component {
 
     /* загружаем страницу */
     this.onLoadPage = async () => {
-      const serchId = await getSearchId(); // получили serchId
-      await this.onLoadTickets(serchId); // вызываем onLoadTickets и передаем полученную строку serchId
+      const serchId = await getSearchId();
+      await this.onLoadTickets(serchId);
     };
 
     /* загружаем пачку тикетов */
     this.onLoadTickets = async (serchId) => {
-      // сюда передали serchId и прокинули дальше в getData
-      const { arrTickets } = this.state; // наш пока пустой массив
-      let stop; // просто создали переменную
+      const { arrTickets } = this.state;
+      let stop;
       try {
-        const response = await getData(serchId); // вызвали getData и прокинули serchId. Дальше она обработается в файле dataRequest
+        const response = await getData(serchId);
+        stop = response.data.stop;
 
-        stop = response.data.stop; // присвоили значение стоп
-
-        const allTickets = response.data.tickets; // вытащили все тикется и присвоили allTickets
+        const allTickets = response.data.tickets;
         this.setState({
-          arrTickets: [...arrTickets, ...allTickets], // добавили в наш новый сформированный массив тикеты
+          arrTickets: [...arrTickets, ...allTickets],
         });
         if (!stop) {
-          await this.onLoadTickets(serchId); // выполняем запрос если !stop
+          await this.onLoadTickets(serchId);
         }
       } catch (event) {
-        if (!stop) {
-          await this.onLoadTickets(serchId); // попрежнему выполняем запрос если !stop
-        }
+        await this.onLoadTickets(serchId); // попрежнему выполняем запрос если !stop
       }
     };
 
@@ -69,7 +65,7 @@ export default class Tickets extends React.Component {
       }
     };
 
-    /* филтруем по перелетам */
+    /* филтруем по чексбоксам */
     this.onFilterCheck = (evt, stops) => {
       if (stops === 'allStops') {
         this.setState((prevState) => ({
@@ -83,33 +79,6 @@ export default class Tickets extends React.Component {
         this.setState((prevState) => ({
           [stops]: !prevState[stops],
         }));
-
-        const { state } = this;
-        const { noStops, oneStop, twoStops, threeStops } = state;
-
-        const previousCheckBoxesStatus = {
-          noStops,
-          oneStop,
-          twoStops,
-          threeStops,
-        };
-
-        const currentCheckBoxesStatus = {
-          ...previousCheckBoxesStatus,
-          [stops]: !state[stops],
-        };
-
-        const predicateAllChecked = !Object.values(currentCheckBoxesStatus).includes(false);
-
-        if (predicateAllChecked) {
-          this.setState({
-            allStops: true,
-          });
-        } else {
-          this.setState({
-            allStops: false,
-          });
-        }
       }
     };
 
