@@ -13,6 +13,9 @@ const cutArray = (arr, numberElemArr) => {
   return resArray;
 };
 
+/* расчитываем цену */
+const formatPrice = (price) => `${price.toString().replace(/(\d)(?=(\d{3})+$)/g, '$1 ')} Р`;
+
 /* расчитали время */
 const formatDuration = (duration) => `${Math.floor(duration / 60)} ч ${duration % 60} м`;
 
@@ -23,4 +26,4 @@ const formatInterval = (date, duration) =>
     'HH:mm'
   )}`;
 
-export { formatDuration, formatInterval, cutArray };
+export { formatPrice, formatDuration, formatInterval, cutArray };

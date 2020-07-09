@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { formatDuration, formatInterval } from '../../api/Utils';
+import { formatDuration, formatInterval, formatPrice } from '../../api/Utils';
 import {
   Item,
   Price,
@@ -33,10 +33,10 @@ const Ticket = (props) => {
     return true;
   };
 
-  const listSegments = segments.map((segment) => (
+  const renderList = segments.map((segment) => (
     <ListSegment key={_.uniqueId()}>
       <ItemSegment>
-        <HeaderSegment>MOW - HKT</HeaderSegment>
+        <HeaderSegment>{`${segment.origin} - ${segment.destination}`}</HeaderSegment>
         <DataSegment>{formatInterval(segment.date, segment.duration)}</DataSegment>
       </ItemSegment>
       <ItemSegment>
@@ -53,12 +53,12 @@ const Ticket = (props) => {
   return (
     <Item>
       <Header>
-        <Price>{price}</Price>
+        <Price>{formatPrice(price)}</Price>
         <CarrierLogo>
           <img src={`//pics.avs.io/99/36/${carrier}.png`} alt={`${carrier}`} />
         </CarrierLogo>
       </Header>
-      {listSegments}
+      {renderList}
     </Item>
   );
 };

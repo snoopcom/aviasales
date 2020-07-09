@@ -5,7 +5,7 @@ import { Container, Header, List, Label, Checkbox } from './Style';
 const Filter = (props) => {
   const { allStops, noStops, oneStop, twoStops, threeStops, onFilterCheck } = props;
 
-  const item = (id, label, checked) => (
+  const renderItem = (id, label, checked) => (
     <div>
       <Checkbox
         type="checkbox"
@@ -21,11 +21,11 @@ const Filter = (props) => {
     <Container>
       <Header>Количество пересадок</Header>
       <List>
-        {item('allStops', 'Все', allStops)}
-        {item('noStops', 'Без пересадок', noStops)}
-        {item('oneStop', '1 пересадка', oneStop)}
-        {item('twoStops', '2 пересадки', twoStops)}
-        {item('threeStops', '3 пересадки', threeStops)}
+        {renderItem('allStops', 'Все', allStops)}
+        {renderItem('noStops', 'Без пересадок', noStops)}
+        {renderItem('oneStop', '1 пересадка', oneStop)}
+        {renderItem('twoStops', '2 пересадки', twoStops)}
+        {renderItem('threeStops', '3 пересадки', threeStops)}
       </List>
     </Container>
   );

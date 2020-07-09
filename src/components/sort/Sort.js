@@ -5,9 +5,10 @@ import { Radio, Label, Container, Item } from './Style';
 const Sort = (props) => {
   const { onSortChange } = props;
 
-  const SortButton = (value, id, label) => (
+  const renderSort = (value, id, label, sorting) => (
     <div>
       <Radio
+        checked={sorting}
         value={value}
         id={id}
         name="sort"
@@ -19,8 +20,8 @@ const Sort = (props) => {
   );
   return (
     <Container>
-      <Item>{SortButton('cheap', 'cheapId', 'Самый дешевый')}</Item>
-      <Item>{SortButton('fast', 'fastId', 'Самый быстрый')}</Item>
+      <Item>{renderSort('cheap', 'cheapId', 'Самый дешевый', true)}</Item>
+      <Item>{renderSort('fast', 'fastId', 'Самый быстрый', false)}</Item>
     </Container>
   );
 };

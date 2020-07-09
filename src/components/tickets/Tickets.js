@@ -5,7 +5,7 @@ import { cutArray } from '../../api/Utils';
 import Ticket from '../ticket/Ticket';
 import Sort from '../sort/Sort';
 import Filter from '../filter/Filter';
-import { BlockСontrol, BlockSort, List } from './Style';
+import { Wrapper, Container, List } from './Style';
 
 const initState = {
   arrTickets: [],
@@ -14,6 +14,7 @@ const initState = {
   oneStop: true,
   twoStops: true,
   threeStops: true,
+  sorting: true,
 };
 
 export default class Tickets extends React.Component {
@@ -49,7 +50,7 @@ export default class Tickets extends React.Component {
 
     /* сортировка на самый быстрый/дешевый */
     this.onSortChange = (event) => {
-      if (event.target.value === 'fast') {
+      if (event.target.checked === true) {
         this.setState((prevState) => ({
           arrTickets: prevState.arrTickets.sort(
             (first, second) =>
@@ -79,6 +80,32 @@ export default class Tickets extends React.Component {
         this.setState((prevState) => ({
           [stops]: !prevState[stops],
         }));
+
+        const { state } = this;
+        const { noStops, oneStop, twoStops, threeStops } = state;
+
+        const prevCheckboxStatus = {
+          noStops,
+          oneStop,
+          twoStops,
+          threeStops,
+        };
+        const currentCheckBoxesStatus = {
+          ...prevCheckboxStatus,
+          [stops]: !state[stops],
+        };
+
+        const trueAllChecked = !Object.values(currentCheckBoxesStatus).includes(false);
+
+        if (trueAllChecked) {
+          this.setState({
+            allStops: true,
+          });
+        } else {
+          this.setState({
+            allStops: false,
+          });
+        }
       }
     };
 
@@ -95,24 +122,26 @@ export default class Tickets extends React.Component {
   }
 
   componentDidMount() {
+    // const { sorting } = this.state;
     this.onLoadPage();
+    // this.onSortChange(sorting);
   }
 
   render() {
-    const { noStops, oneStop, twoStops, threeStops, allStops } = this.state;
+    const { noStops, oneStop, twoStops, threeStops, allStops, sorting } = this.state;
     const firstFiveTickets = cutArray(this.filterTikets(), 5); // первых пять билетов
 
     /* список билетов */
-    const ticketsList = firstFiveTickets.map((ticket) => (
+    const renderTickets = firstFiveTickets.map((ticket) => (
       <Ticket
         key={_.uniqueId()}
-        segments={ticket.segments}
         price={ticket.price}
         carrier={ticket.carrier}
+        segments={ticket.segments}
       />
     ));
     return (
-      <BlockСontrol>
+      <Wrapper>
         <Filter
           allStops={allStops}
           noStops={noStops}
@@ -121,11 +150,11 @@ export default class Tickets extends React.Component {
           threeStops={threeStops}
           onFilterCheck={this.onFilterCheck}
         />
-        <BlockSort>
-          <Sort onSortChange={this.onSortChange} />
-          <List>{ticketsList}</List>
-        </BlockSort>
-      </BlockСontrol>
+        <Container>
+          <Sort sorting={sorting} onSortChange={this.onSortChange} />
+          <List>{renderTickets}</List>
+        </Container>
+      </Wrapper>
     );
   }
 }

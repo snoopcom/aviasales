@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const BlockСontrol = styled.div`
+export const Wrapper = styled.div`
   display: flex;
   align-items: flex-start;
   margin: 0 auto;
@@ -11,7 +11,7 @@ export const BlockСontrol = styled.div`
   }
 `;
 
-export const BlockSort = styled.div`
+export const Container = styled.div`
   display: flex;
   flex-direction: column;
   flex-grow: 1;
