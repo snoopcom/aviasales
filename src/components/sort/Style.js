@@ -12,6 +12,10 @@ export const Label = styled.label`
   text-align: center;
   text-transform: uppercase;
   transition: all 0.3s ease;
+  &:checked {
+    background-color: #2196f3;
+    color: #ffffff;
+  }
 `;
 
 export const Radio = styled.input`

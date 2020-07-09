@@ -1,5 +1,4 @@
 import React from 'react';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 import { formatDuration, formatInterval, formatPrice } from '../../api/Utils';
 import {
@@ -14,7 +13,7 @@ import {
 } from './Style';
 
 const Ticket = (props) => {
-  const { price, carrier, segments } = props;
+  const { price, carrier, segments, id } = props;
 
   /* количество пересадок */
   const quantityStops = (stops) => {
@@ -33,8 +32,8 @@ const Ticket = (props) => {
     return true;
   };
 
-  const renderList = segments.map((segment) => (
-    <ListSegment key={_.uniqueId()}>
+  const renderList = segments.map((segment, index) => (
+    <ListSegment key={`${id + index}`}>
       <ItemSegment>
         <HeaderSegment>{`${segment.origin} - ${segment.destination}`}</HeaderSegment>
         <DataSegment>{formatInterval(segment.date, segment.duration)}</DataSegment>
@@ -64,6 +63,7 @@ const Ticket = (props) => {
 };
 
 Ticket.propTypes = {
+  id: PropTypes.string.isRequired,
   price: PropTypes.number.isRequired,
   carrier: PropTypes.string.isRequired,
   segments: PropTypes.arrayOf(PropTypes.object).isRequired,

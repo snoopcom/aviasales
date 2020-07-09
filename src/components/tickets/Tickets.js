@@ -15,6 +15,8 @@ const initState = {
   twoStops: true,
   threeStops: true,
   sorting: true,
+  cheapChecked: true,
+  fastChecked: false,
 };
 
 export default class Tickets extends React.Component {
@@ -22,35 +24,9 @@ export default class Tickets extends React.Component {
     super(props);
     this.state = initState;
 
-    /* загружаем страницу */
-    this.onLoadPage = async () => {
-      const serchId = await getSearchId();
-      await this.onLoadTickets(serchId);
-    };
-
-    /* загружаем пачку тикетов */
-    this.onLoadTickets = async (serchId) => {
-      const { arrTickets } = this.state;
-      let stop;
-      try {
-        const response = await getData(serchId);
-        stop = response.data.stop;
-
-        const allTickets = response.data.tickets;
-        this.setState({
-          arrTickets: [...arrTickets, ...allTickets],
-        });
-        if (!stop) {
-          await this.onLoadTickets(serchId);
-        }
-      } catch (event) {
-        await this.onLoadTickets(serchId); // попрежнему выполняем запрос если !stop
-      }
-    };
-
     /* сортировка на самый быстрый/дешевый */
     this.onSortChange = (event) => {
-      if (event.target.checked === true) {
+      if (event.target.value === 'fast') {
         this.setState((prevState) => ({
           arrTickets: prevState.arrTickets.sort(
             (first, second) =>
@@ -58,10 +34,14 @@ export default class Tickets extends React.Component {
               first.segments[1].duration -
               (second.segments[0].duration + second.segments[1].duration)
           ),
+          cheapChecked: false,
+          fastChecked: true,
         }));
       } else {
         this.setState((prevState) => ({
           arrTickets: prevState.arrTickets.sort((first, second) => first.price - second.price),
+          cheapChecked: true,
+          fastChecked: false,
         }));
       }
     };
@@ -122,19 +102,64 @@ export default class Tickets extends React.Component {
   }
 
   componentDidMount() {
-    // const { sorting } = this.state;
     this.onLoadPage();
-    // this.onSortChange(sorting);
   }
 
+  /* сразу загружаем самые дешевые */
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.arrTickets.length === 0) {
+      const event = {
+        target: {
+          value: null,
+        },
+      };
+      this.onSortChange(event);
+    }
+  }
+
+  /* загружаем страницу */
+  onLoadPage = async () => {
+    const serchId = await getSearchId();
+    await this.onLoadTickets(serchId);
+  };
+
+  /* загружаем пачку тикетов */
+  onLoadTickets = async (serchId) => {
+    const { arrTickets } = this.state;
+    let stop;
+    try {
+      const response = await getData(serchId);
+      stop = response.data.stop;
+
+      const allTickets = response.data.tickets.map((ticket) => ({ ...ticket, id: _.uniqueId() }));
+      this.setState({
+        arrTickets: [...arrTickets, ...allTickets],
+      });
+      if (!stop) {
+        await this.onLoadTickets(serchId);
+      }
+    } catch (event) {
+      await this.onLoadTickets(serchId); // попрежнему выполняем запрос если !stop
+    }
+  };
+
   render() {
-    const { noStops, oneStop, twoStops, threeStops, allStops, sorting } = this.state;
+    const {
+      noStops,
+      oneStop,
+      twoStops,
+      threeStops,
+      allStops,
+      cheapChecked,
+      fastChecked,
+    } = this.state;
     const firstFiveTickets = cutArray(this.filterTikets(), 5); // первых пять билетов
 
     /* список билетов */
     const renderTickets = firstFiveTickets.map((ticket) => (
       <Ticket
-        key={_.uniqueId()}
+        id={ticket.id}
+        key={ticket.id}
         price={ticket.price}
         carrier={ticket.carrier}
         segments={ticket.segments}
@@ -151,7 +176,11 @@ export default class Tickets extends React.Component {
           onFilterCheck={this.onFilterCheck}
         />
         <Container>
-          <Sort sorting={sorting} onSortChange={this.onSortChange} />
+          <Sort
+            cheapChecked={cheapChecked}
+            fastChecked={fastChecked}
+            onSortChange={this.onSortChange}
+          />
           <List>{renderTickets}</List>
         </Container>
       </Wrapper>
